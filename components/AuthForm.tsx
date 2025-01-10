@@ -23,7 +23,7 @@ import { signIn, signUp } from "@/lib/actions/user.actions";
 
 const AuthForm = ({ type }: { type: string }) => {
   const [user, setUser] = useState(null);
-  const [isloading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   // const [isVisible, setIsVisile] = useState(true);
   const router = useRouter();
   const formSchema = authFormSchema(type);
@@ -34,6 +34,12 @@ const AuthForm = ({ type }: { type: string }) => {
     defaultValues: {
       email: "",
       password: "",
+      firstName: "",
+      lastName: "",
+      city: "",
+      state: "",
+      address1: "",
+      dateOfBirth: "",
     },
   });
 
@@ -41,12 +47,18 @@ const AuthForm = ({ type }: { type: string }) => {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
 
+    debugger;
+
     try {
       //Sign up wth appwrite and plaid link token
 
       if (type === "sign-up") {
         const newUser = await signUp(data);
         setUser(newUser);
+
+        if (newUser) {
+          router.push("/");
+        }
       }
 
       if (type === "sign-in") {
@@ -54,6 +66,7 @@ const AuthForm = ({ type }: { type: string }) => {
           email: data.email,
           password: data.password,
         });
+
         if (response) {
           router.push("/");
         }
@@ -82,11 +95,7 @@ const AuthForm = ({ type }: { type: string }) => {
 
         <div className="flex flex-col gap-1 md:gap-3">
           <h1 className="text-24 lg:text-36 font-semibold text-gray-900">
-            {user
-              ? "Link Account "
-              : type === "sign-in"
-              ? "Sign In"
-              : "Sign Up"}
+            {user ? "Link Account" : type === "sign-in" ? "Sign In" : "Sign Up"}
           </h1>
           <p className="text-16 font-normal text-gray-600">
             {user
@@ -182,8 +191,8 @@ const AuthForm = ({ type }: { type: string }) => {
                 placeholder="Enter your password"
               />
               <div className="flex flex-col gap-4">
-                <Button type="submit" disabled={isloading} className="form-btn">
-                  {isloading ? (
+                <Button type="submit" disabled={isLoading} className="form-btn">
+                  {isLoading ? (
                     <>
                       <Loader2 size={20} className="animate-spin" /> &nbsp;
                       Loading...
